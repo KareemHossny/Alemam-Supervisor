@@ -198,76 +198,62 @@ const ReviewDailyTasks = () => {
           tasks.map((task) => (
             <div
               key={task._id}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200/50 p-6 hover:shadow-xl transition-all duration-300"
+              className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-gray-200/50 p-4 sm:p-6 hover:shadow-xl transition-all duration-300"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-semibold text-gray-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                    <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
                       {task.title}
                     </h3>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(task.status)}`}>
-                      {getStatusText(task.status)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-4 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
+                    <span
+                      className={`mt-1 sm:mt-0 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border flex items-center gap-1 ${getStatusColor(task.status)}`}
+                    >
                       {getStatusIcon(task.status)}
                       <span>{getStatusText(task.status)}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <FiCalendar className="w-4 h-4" />
-                      <span>{new Date(task.date).toLocaleDateString('ar-EG')}</span>
-                    </div>
-                    {task.createdBy && (
-                      <div className="flex items-center space-x-1">
-                        <span className="text-gray-500">بواسطة:</span>
-                        <span className="font-medium">{task.createdBy.name}</span>
-                      </div>
-                    )}
+                    </span>
                   </div>
                 </div>
-                
+
                 {task.status === 'pending' && (
                   <button
                     onClick={() => startReview(task)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors"
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors w-full sm:w-auto mt-2 sm:mt-0"
                   >
                     <FiEdit className="w-4 h-4" />
-                    <span>مراجعة</span>
+                    <span className="text-sm">مراجعة</span>
                   </button>
                 )}
               </div>
 
               {task.note && (
-                <div className="mb-4 p-4 bg-gray-50 rounded-xl">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-1">ملاحظات المهندس:</h4>
-                  <p className="text-gray-600 text-sm">{task.note}</p>
+                <div className="mb-4 p-3 sm:p-4 bg-gray-50 rounded-xl text-xs sm:text-sm break-words">
+                  <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-1">ملاحظات المهندس:</h4>
+                  <p className="text-gray-600">{task.note}</p>
                 </div>
               )}
 
               {task.supervisorNote && (
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <h4 className="text-sm font-semibold text-blue-800 mb-1">ملاحظاتك السابقة:</h4>
-                  <p className="text-blue-700 text-sm">{task.supervisorNote}</p>
+                <div className="p-3 sm:p-4 bg-blue-50 rounded-xl border border-blue-200 text-xs sm:text-sm break-words">
+                  <h4 className="text-xs sm:text-sm font-semibold text-blue-800 mb-1">ملاحظاتك السابقة:</h4>
+                  <p className="text-blue-700">{task.supervisorNote}</p>
                 </div>
               )}
 
               {/* Review Form */}
               {reviewingTask && reviewingTask._id === task._id && (
-                <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-200">
-                  <h4 className="text-sm font-semibold text-orange-800 mb-3">مراجعة المهمة</h4>
+                <div className="mt-4 p-3 sm:p-4 bg-orange-50 rounded-xl border border-orange-200">
+                  <h4 className="text-xs sm:text-sm font-semibold text-orange-800 mb-3">مراجعة المهمة</h4>
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-orange-700 mb-2">
+                      <label className="block text-xs sm:text-sm font-medium text-orange-700 mb-2">
                         حالة المهمة
                       </label>
                       <select
                         value={reviewData.status}
                         onChange={(e) => setReviewData({...reviewData, status: e.target.value})}
-                        className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-2 sm:px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs sm:text-sm"
                       >
                         <option value="pending">بانتظار المراجعة</option>
                         <option value="done">تمت ✅</option>
@@ -276,7 +262,7 @@ const ReviewDailyTasks = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-orange-700 mb-2">
+                      <label className="block text-xs sm:text-sm font-medium text-orange-700 mb-2">
                         ملاحظاتك
                       </label>
                       <textarea
@@ -284,20 +270,20 @@ const ReviewDailyTasks = () => {
                         onChange={(e) => setReviewData({...reviewData, supervisorNote: e.target.value})}
                         placeholder="أضف ملاحظاتك للمهندس..."
                         rows="3"
-                        className="w-full px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                        className="w-full px-2 sm:px-3 py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs sm:text-sm"
                       />
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                       <button
                         onClick={submitReview}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                        className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-xs sm:text-sm"
                       >
                         حفظ المراجعة
                       </button>
                       <button
                         onClick={cancelReview}
-                        className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                        className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors text-xs sm:text-sm"
                       >
                         إلغاء
                       </button>
