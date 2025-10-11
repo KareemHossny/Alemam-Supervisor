@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiEye, FiCalendar, FiArrowLeft, FiCheckCircle, FiClock, FiAlertCircle, FiEdit, FiUser } from 'react-icons/fi';
+import { FiEye, FiCalendar, FiArrowLeft, FiCheckCircle, FiClock, FiAlertCircle, FiEdit, FiUser, FiExternalLink } from 'react-icons/fi';
 import { supervisorAPI } from '../utils/api';
 
 const ReviewMonthlyTasks = () => {
@@ -88,6 +88,10 @@ const ReviewMonthlyTasks = () => {
     } catch (err) {
       setMessage('فشل في مراجعة المهمة');
     }
+  };
+
+  const viewTaskDetails = (taskId) => {
+    navigate(`/dashboard/task-details/monthly/${taskId}`);
   };
 
   const getStatusIcon = (status) => {
@@ -237,15 +241,28 @@ const ReviewMonthlyTasks = () => {
                   </div>
                 </div>
 
-                {task.status === 'pending' && (
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                  {/* View Details Button */}
                   <button
-                    onClick={() => startReview(task)}
-                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg sm:rounded-xl transition-colors w-full sm:w-auto mt-2 sm:mt-0 text-xs sm:text-sm"
+                    onClick={() => viewTaskDetails(task._id)}
+                    className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg sm:rounded-xl transition-colors w-full sm:w-auto text-xs sm:text-sm"
                   >
-                    <FiEdit className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>مراجعة</span>
+                    <FiExternalLink className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>عرض التفاصيل</span>
                   </button>
-                )}
+
+                  {/* Review Button - Only for pending tasks */}
+                  {task.status === 'pending' && (
+                    <button
+                      onClick={() => startReview(task)}
+                      className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg sm:rounded-xl transition-colors w-full sm:w-auto text-xs sm:text-sm"
+                    >
+                      <FiEdit className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>مراجعة</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               {task.note && (

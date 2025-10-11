@@ -49,6 +49,8 @@ export const supervisorAPI = {
   getMonthlyTasks: (projectId) => api.get(`/supervisor/monthly-tasks/${projectId}`),
   reviewDailyTask: (taskId, reviewData) => api.put(`/supervisor/daily-tasks/${taskId}/review`, reviewData),
   reviewMonthlyTask: (taskId, reviewData) => api.put(`/supervisor/monthly-tasks/${taskId}/review`, reviewData),
+  getDailyTaskById: (taskId) => api.get(`/supervisor/daily-task/${taskId}`),
+  getMonthlyTaskById: (taskId) => api.get(`/supervisor/monthly-task/${taskId}`),
 };
 
 // وظيفة للتحقق من حالة السيرفر

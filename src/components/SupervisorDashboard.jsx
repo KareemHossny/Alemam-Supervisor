@@ -14,6 +14,7 @@ import {
 import ReviewTasks from './ReviewTasks';
 import ReviewDailyTasks from './ReviewDailyTasks';
 import ReviewMonthlyTasks from './ReviewMonthlyTasks';
+import TaskDetails from './TaskDetails';
 import { supervisorAPI } from '../utils/api';
 
 const SupervisorDashboard = ({ onLogout, supervisorInfo }) => {
@@ -254,12 +255,13 @@ const SupervisorDashboard = ({ onLogout, supervisorInfo }) => {
 
         {/* Page Content */}
         <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 bg-transparent">
-          <Routes>
-            <Route path="review-tasks" element={<ReviewTasks />} />
-            <Route path="review-daily-tasks/:projectId" element={<ReviewDailyTasks />} />
-            <Route path="review-monthly-tasks/:projectId" element={<ReviewMonthlyTasks />} />
-            <Route path="/" element={<SupervisorWelcomeSection stats={stats} loading={loading} supervisorInfo={supervisorInfo} />} />
-          </Routes>
+        <Routes>
+  <Route path="review-tasks" element={<ReviewTasks />} />
+  <Route path="review-daily-tasks/:projectId" element={<ReviewDailyTasks />} />
+  <Route path="review-monthly-tasks/:projectId" element={<ReviewMonthlyTasks />} />
+  <Route path="task-details/:taskType/:taskId" element={<TaskDetails />} />
+  <Route path="/" element={<SupervisorWelcomeSection stats={stats} loading={loading} supervisorInfo={supervisorInfo} />} />
+</Routes>
         </main>
       </div>
 
