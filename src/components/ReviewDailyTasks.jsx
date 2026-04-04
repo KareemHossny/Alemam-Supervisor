@@ -3,6 +3,19 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiEye, FiCalendar, FiArrowLeft, FiCheckCircle, FiClock, FiAlertCircle, FiEdit, FiUser } from 'react-icons/fi';
 import { supervisorAPI } from '../utils/api';
 
+const getLocalDateInputValue = () => (
+  new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]
+);
+
+const formatStoredDateForDisplay = (dateValue) => (
+  new Intl.DateTimeFormat('ar-EG', {
+    timeZone: 'UTC',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  }).format(new Date(dateValue))
+);
+
 const ReviewDailyTasks = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -10,7 +23,7 @@ const ReviewDailyTasks = () => {
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(getLocalDateInputValue());
   const [message, setMessage] = useState('');
   const [reviewingTask, setReviewingTask] = useState(null);
   const [reviewData, setReviewData] = useState({
@@ -36,15 +49,8 @@ const ReviewDailyTasks = () => {
     if (!projectId || !selectedDate) return;
     
     try {
-      const response = await supervisorAPI.getDailyTasks(projectId);
-      
-      // Filter tasks based on selected date
-      const filteredTasks = response.data.filter(task => {
-        const taskDate = new Date(task.date).toISOString().split('T')[0];
-        return taskDate === selectedDate;
-      });
-      
-      setTasks(filteredTasks);
+      const response = await supervisorAPI.getDailyTasks(projectId, selectedDate);
+      setTasks(response.data);
     } catch (err) {
       console.error('Error fetching tasks:', err);
       setTasks([]);
@@ -220,7 +226,7 @@ const ReviewDailyTasks = () => {
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <FiCalendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span>{new Date(task.date).toLocaleDateString('ar-EG')}</span>
+                      <span>{formatStoredDateForDisplay(task.date)}</span>
                     </div>
                     {task.createdBy && (
                       <div className="flex items-center gap-1">

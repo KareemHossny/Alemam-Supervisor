@@ -45,7 +45,9 @@ export const supervisorAPI = {
   getMyProjects: () => api.get('/supervisor/projects'),
   
   // Tasks Review
-  getDailyTasks: (projectId) => api.get(`/supervisor/daily-tasks/${projectId}`),
+  getDailyTasks: (projectId, date) => api.get(`/supervisor/daily-tasks/${projectId}`, {
+    params: date ? { date } : undefined,
+  }),
   getMonthlyTasks: (projectId) => api.get(`/supervisor/monthly-tasks/${projectId}`),
   reviewDailyTask: (taskId, reviewData) => api.put(`/supervisor/daily-tasks/${taskId}/review`, reviewData),
   reviewMonthlyTask: (taskId, reviewData) => api.put(`/supervisor/monthly-tasks/${taskId}/review`, reviewData),
