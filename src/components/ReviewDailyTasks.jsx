@@ -19,7 +19,7 @@ const formatStoredDateForDisplay = (dateValue) => (
 const ReviewDailyTasks = () => {
   const { projectId } = useParams();
   const navigate = useNavigate();
-  
+
   const [project, setProject] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,29 +28,29 @@ const ReviewDailyTasks = () => {
   const [reviewingTask, setReviewingTask] = useState(null);
   const [reviewData, setReviewData] = useState({
     status: 'pending',
-    supervisorNote: ''
+    supervisorNote: '',
   });
 
-  // استخدام useCallback لـ fetchProjectDetails
   const fetchProjectDetails = useCallback(async () => {
     try {
-      const response = await supervisorAPI.getMyProjects();
-      const projectData = response.data.find(p => p._id === projectId);
+      const projects = await supervisorAPI.getMyProjects();
+      const projectData = projects.find((item) => item._id === projectId) || null;
       setProject(projectData);
     } catch (err) {
-      setMessage('فشل تحميل تفاصيل المشروع');
+      setMessage(err.message || 'فشل تحميل تفاصيل المشروع');
     } finally {
       setLoading(false);
     }
   }, [projectId]);
 
-  // استخدام useCallback علشان نحافظ على reference الـ function
   const fetchTasks = useCallback(async () => {
-    if (!projectId || !selectedDate) return;
-    
+    if (!projectId || !selectedDate) {
+      return;
+    }
+
     try {
-      const response = await supervisorAPI.getDailyTasks(projectId, selectedDate);
-      setTasks(response.data);
+      const taskPage = await supervisorAPI.getDailyTasks(projectId, selectedDate);
+      setTasks(taskPage.data || []);
     } catch (err) {
       console.error('Error fetching tasks:', err);
       setTasks([]);
@@ -71,7 +71,7 @@ const ReviewDailyTasks = () => {
     setReviewingTask(task);
     setReviewData({
       status: task.status,
-      supervisorNote: task.supervisorNote || ''
+      supervisorNote: task.supervisorNote || '',
     });
   };
 
@@ -79,20 +79,22 @@ const ReviewDailyTasks = () => {
     setReviewingTask(null);
     setReviewData({
       status: 'pending',
-      supervisorNote: ''
+      supervisorNote: '',
     });
   };
 
   const submitReview = async () => {
-    if (!reviewingTask) return;
+    if (!reviewingTask) {
+      return;
+    }
 
     try {
       await supervisorAPI.reviewDailyTask(reviewingTask._id, reviewData);
       setMessage('تمت مراجعة المهمة بنجاح');
       setReviewingTask(null);
-      fetchTasks(); // Refresh the list
+      fetchTasks();
     } catch (err) {
-      setMessage('فشل في مراجعة المهمة');
+      setMessage(err.message || 'فشل في مراجعة المهمة');
     }
   };
 
@@ -100,8 +102,9 @@ const ReviewDailyTasks = () => {
     const icons = {
       pending: <FiClock className="w-3 h-3 sm:w-4 sm:h-4 text-orange-500" />,
       done: <FiCheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />,
-      failed: <FiAlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-rose-500" />
+      failed: <FiAlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-rose-500" />,
     };
+
     return icons[status] || icons.pending;
   };
 
@@ -109,8 +112,9 @@ const ReviewDailyTasks = () => {
     const texts = {
       pending: 'بانتظار المراجعة',
       done: 'تمت',
-      failed: 'لم تتم'
+      failed: 'لم تتم',
     };
+
     return texts[status] || 'بانتظار المراجعة';
   };
 
@@ -118,8 +122,9 @@ const ReviewDailyTasks = () => {
     const colors = {
       pending: 'bg-orange-100 text-orange-800 border-orange-200',
       done: 'bg-green-100 text-green-800 border-green-200',
-      failed: 'bg-rose-100 text-rose-800 border-rose-200'
+      failed: 'bg-rose-100 text-rose-800 border-rose-200',
     };
+
     return colors[status] || colors.pending;
   };
 
@@ -136,7 +141,6 @@ const ReviewDailyTasks = () => {
 
   return (
     <div className="max-w-6xl mx-auto w-full px-2 sm:px-4" dir="rtl">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div className="flex items-center gap-3 sm:gap-4">
           <button
@@ -157,7 +161,6 @@ const ReviewDailyTasks = () => {
         </div>
       </div>
 
-      {/* Date Selection */}
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg border border-gray-200/50 p-4 sm:p-6 mb-6 sm:mb-8">
         <div className="flex flex-col md:flex-row md:items-center gap-3 sm:gap-4">
           <div className="flex-1 max-w-xs">
@@ -176,25 +179,23 @@ const ReviewDailyTasks = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="text-xs sm:text-sm text-gray-600 text-right">
             عرض {tasks.length} مهمة لليوم {selectedDate}
           </div>
         </div>
       </div>
 
-      {/* Message */}
       {message && (
         <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border mb-4 sm:mb-6 text-sm sm:text-base ${
-          message.includes('نجاح') 
-            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+          message.includes('نجاح')
+            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
             : 'bg-rose-50 text-rose-700 border-rose-200'
         }`}>
           {message}
         </div>
       )}
 
-      {/* Tasks List */}
       <div className="space-y-3 sm:space-y-4">
         {tasks.length === 0 ? (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-lg border border-gray-200/50 p-6 sm:p-8 lg:p-12 text-center">
@@ -262,11 +263,10 @@ const ReviewDailyTasks = () => {
                 </div>
               )}
 
-              {/* Review Form */}
               {reviewingTask && reviewingTask._id === task._id && (
                 <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-orange-50 rounded-lg sm:rounded-xl border border-orange-200">
                   <h4 className="text-xs sm:text-sm font-semibold text-orange-800 mb-2 sm:mb-3">مراجعة المهمة</h4>
-                  
+
                   <div className="space-y-3 sm:space-y-4">
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-orange-700 mb-2">
@@ -274,12 +274,12 @@ const ReviewDailyTasks = () => {
                       </label>
                       <select
                         value={reviewData.status}
-                        onChange={(e) => setReviewData({...reviewData, status: e.target.value})}
+                        onChange={(e) => setReviewData({ ...reviewData, status: e.target.value })}
                         className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-xs sm:text-sm"
                       >
                         <option value="pending">بانتظار المراجعة</option>
-                        <option value="done">تمت ✅</option>
-                        <option value="failed">لم تتم ❌</option>
+                        <option value="done">تمت</option>
+                        <option value="failed">لم تتم</option>
                       </select>
                     </div>
 
@@ -289,7 +289,7 @@ const ReviewDailyTasks = () => {
                       </label>
                       <textarea
                         value={reviewData.supervisorNote}
-                        onChange={(e) => setReviewData({...reviewData, supervisorNote: e.target.value})}
+                        onChange={(e) => setReviewData({ ...reviewData, supervisorNote: e.target.value })}
                         placeholder="أضف ملاحظاتك للمهندس..."
                         rows="3"
                         className="w-full px-2 sm:px-3 py-1 sm:py-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none text-xs sm:text-base"

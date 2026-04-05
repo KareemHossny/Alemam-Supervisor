@@ -9,18 +9,16 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // استخدام useCallback لمنع إعادة إنشاء الدالة في كل render
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
 
     if (!serverOnline) {
-      setError('Ø§Ù„Ø³ÙŠØ±ÙØ± ØºÙŠØ± Ù…ØªØ§Ø­. ÙŠØ±Ø¬Ù‰ Ø§Ù„Ù…Ø­Ø§ÙˆÙ„Ø© Ù…Ø±Ø© Ø£Ø®Ø±Ù‰.');
+      setError('Ã˜Â§Ã™â€žÃ˜Â³Ã™Å Ã˜Â±Ã™ÂÃ˜Â± Ã˜ÂºÃ™Å Ã˜Â± Ã™â€¦Ã˜ÂªÃ˜Â§Ã˜Â­. Ã™Å Ã˜Â±Ã˜Â¬Ã™â€° Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â­Ã˜Â§Ã™Ë†Ã™â€žÃ˜Â© Ã™â€¦Ã˜Â±Ã˜Â© Ã˜Â£Ã˜Â®Ã˜Â±Ã™â€°.');
       return;
     }
 
-    // التحقق من صحة البيانات قبل الإرسال
     if (!formData.email || !formData.password) {
-      setError('ÙŠØ±Ø¬Ù‰ Ù…Ù„Ø¡ Ø¬Ù…ÙŠØ¹ Ø§Ù„Ø­Ù‚ÙˆÙ„ Ø§Ù„Ù…Ø·Ù„ÙˆØ¨Ø©.');
+      setError('Ã™Å Ã˜Â±Ã˜Â¬Ã™â€° Ã™â€¦Ã™â€žÃ˜Â¡ Ã˜Â¬Ã™â€¦Ã™Å Ã˜Â¹ Ã˜Â§Ã™â€žÃ˜Â­Ã™â€šÃ™Ë†Ã™â€ž Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â·Ã™â€žÃ™Ë†Ã˜Â¨Ã˜Â©.');
       return;
     }
 
@@ -29,24 +27,22 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
 
     try {
       await supervisorAPI.login(formData);
-      const sessionResponse = await supervisorAPI.getCurrentUser();
+      const session = await supervisorAPI.getCurrentUser();
 
-      if (sessionResponse.data?.user) {
-        onLogin(sessionResponse.data.user);
+      if (session.user) {
+        onLogin(session.user);
       } else {
-        throw new Error('Ù„Ù… ÙŠØªÙ… Ø¥Ù†Ø´Ø§Ø¡ Ø¬Ù„Ø³Ø© Ù…ØµØ§Ø¯Ù‚Ø©');
+        throw new Error('Ã™â€žÃ™â€¦ Ã™Å Ã˜ÂªÃ™â€¦ Ã˜Â¥Ã™â€ Ã˜Â´Ã˜Â§Ã˜Â¡ Ã˜Â¬Ã™â€žÃ˜Â³Ã˜Â© Ã™â€¦Ã˜ÂµÃ˜Â§Ã˜Â¯Ã™â€šÃ˜Â©');
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.message
-        || err.message
-        || 'ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„. ÙŠØ±Ø¬Ù‰ Ø§Ù„ØªØ­Ù‚Ù‚ Ù…Ù† Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯.';
+      const errorMessage = err.message
+        || 'Ã™ÂÃ˜Â´Ã™â€ž Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž. Ã™Å Ã˜Â±Ã˜Â¬Ã™â€° Ã˜Â§Ã™â€žÃ˜ÂªÃ˜Â­Ã™â€šÃ™â€š Ã™â€¦Ã™â€  Ã˜Â¨Ã™Å Ã˜Â§Ã™â€ Ã˜Â§Ã˜Âª Ã˜Â§Ã™â€žÃ˜Â§Ã˜Â¹Ã˜ÂªÃ™â€¦Ã˜Â§Ã˜Â¯.';
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   }, [formData, serverOnline, onLogin]);
 
-  // استخدام useCallback للدوال المعالجة
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -56,7 +52,6 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
     if (error) setError('');
   }, [error]);
 
-  // استخدام useMemo للقيم المشتقة
   const isFormValid = useMemo(() =>
     formData.email && formData.password && serverOnline,
     [formData.email, formData.password, serverOnline]
@@ -83,7 +78,6 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" dir="rtl">
-      {/* Overlay */}
       <div
         className="fixed inset-0 w-full h-full z-0"
         style={{
@@ -94,7 +88,6 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
         aria-hidden="true"
       />
 
-      {/* Main Login Card */}
       <div className="w-full max-w-lg z-10">
         <div
           className="rounded-3xl shadow-2xl border border-white/50 overflow-hidden relative bg-cover bg-center bg-no-repeat min-h-[600px]"
@@ -102,9 +95,8 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
             backgroundImage: `url('photo_2025-09-15_04-00-21.jpg')`,
           }}
           role="img"
-          aria-label="Ø®Ù„ÙÙŠØ© ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„"
+          aria-label="Ã˜Â®Ã™â€žÃ™ÂÃ™Å Ã˜Â© Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž"
         >
-          {/* Overlay for readability */}
           <div
             className="absolute inset-0 z-0"
             style={{
@@ -115,19 +107,16 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
             aria-hidden="true"
           />
 
-          {/* Header Section */}
           <div className="p-4 sm:p-6 md:p-8 text-center relative z-10">
             <div className="relative z-10">
-              {/* Logo with better error handling */}
               <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/30">
                 <img
                   src="/OIP (4).webp"
-                  alt="Ø´Ø¹Ø§Ø± Ø§Ù„Ø´Ø±ÙƒØ©"
+                  alt="Ã˜Â´Ã˜Â¹Ã˜Â§Ã˜Â± Ã˜Â§Ã™â€žÃ˜Â´Ã˜Â±Ã™Æ’Ã˜Â©"
                   className="w-full h-full object-cover rounded-lg"
                   loading="eager"
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    // عرض بديل إذا فشل تحميل الصورة
                     const fallback = document.createElement('div');
                     fallback.className = 'w-full h-full flex items-center justify-center text-white text-xs';
                     fallback.textContent = 'LOGO';
@@ -136,17 +125,15 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                 />
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
-                Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†
+                Ã˜Â¨Ã™Ë†Ã˜Â§Ã˜Â¨Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â´Ã˜Â±Ã™ÂÃ™Å Ã™â€ 
               </h1>
               <p className="text-blue-100 text-sm sm:text-lg opacity-90">
-                Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù‡Ø§Ù… ÙˆØ§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø§Øª
+                Ã˜Â¥Ã˜Â¯Ã˜Â§Ã˜Â±Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã™â€¡Ã˜Â§Ã™â€¦ Ã™Ë†Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â±Ã˜Â§Ã˜Â¬Ã˜Â¹Ã˜Â§Ã˜Âª
               </p>
             </div>
           </div>
 
-          {/* Form Section */}
           <div className="p-4 sm:p-6 md:p-8 relative z-10">
-            {/* Server Status */}
             <div
               className={`mb-4 sm:mb-6 inline-flex items-center px-3 py-2 sm:px-4 sm:py-3 rounded-xl text-xs sm:text-sm font-semibold w-full justify-center transition-all duration-300 ${
                 serverStatusConfig[status].bg
@@ -161,11 +148,10 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                   serverStatusConfig[status].dot
                 }`}
               />
-              {serverOnline ? 'âœ“ Ø§Ù„Ø³ÙŠØ±ÙØ± Ù…ØªØµÙ„ ÙˆØ¬Ø§Ù‡Ø²' : 'âœ— Ø§Ù„Ø³ÙŠØ±ÙØ± ØºÙŠØ± Ù…ØªØµÙ„'}
+              {serverOnline ? 'Ã¢Å“â€œ Ã˜Â§Ã™â€žÃ˜Â³Ã™Å Ã˜Â±Ã™ÂÃ˜Â± Ã™â€¦Ã˜ÂªÃ˜ÂµÃ™â€ž Ã™Ë†Ã˜Â¬Ã˜Â§Ã™â€¡Ã˜Â²' : 'Ã¢Å“â€” Ã˜Â§Ã™â€žÃ˜Â³Ã™Å Ã˜Â±Ã™ÂÃ˜Â± Ã˜ÂºÃ™Å Ã˜Â± Ã™â€¦Ã˜ÂªÃ˜ÂµÃ™â€ž'}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6" noValidate>
-              {/* Error Message */}
               {error && (
                 <div
                   className="p-3 sm:p-4 bg-rose-50 border border-rose-200 rounded-xl animate-shake shadow-lg"
@@ -178,7 +164,7 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                     </svg>
                     <div className="flex-1 text-right">
                       <span className="font-bold text-rose-800 text-xs sm:text-sm block">
-                        Ù…Ø·Ù„ÙˆØ¨ Ù…ØµØ§Ø¯Ù‚Ø©
+                        Ã™â€¦Ã˜Â·Ã™â€žÃ™Ë†Ã˜Â¨ Ã™â€¦Ã˜ÂµÃ˜Â§Ã˜Â¯Ã™â€šÃ˜Â©
                       </span>
                       <p className="text-rose-700 text-xs mt-1 leading-relaxed">
                         {error}
@@ -188,13 +174,12 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                 </div>
               )}
 
-              {/* Email Field */}
               <div className="space-y-2">
                 <label
                   htmlFor="email"
                   className="block text-xs sm:text-sm font-semibold text-blue-100 tracking-wide text-right"
                 >
-                  Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
+                  Ã˜Â§Ã™â€žÃ˜Â¨Ã˜Â±Ã™Å Ã˜Â¯ Ã˜Â§Ã™â€žÃ˜Â¥Ã™â€žÃ™Æ’Ã˜ÂªÃ˜Â±Ã™Ë†Ã™â€ Ã™Å 
                 </label>
                 <div className="relative group">
                   <input
@@ -218,13 +203,12 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                 </div>
               </div>
 
-              {/* Password Field */}
               <div className="space-y-2">
                 <label
                   htmlFor="password"
                   className="block text-xs sm:text-sm font-semibold text-blue-100 tracking-wide text-right"
                 >
-                  ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±
+                  Ã™Æ’Ã™â€žÃ™â€¦Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â±Ã™Ë†Ã˜Â±
                 </label>
                 <div className="relative group">
                   <input
@@ -235,7 +219,7 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                     onChange={handleChange}
                     required
                     disabled={!serverOnline || loading}
-                    placeholder="Ø£Ø¯Ø®Ù„ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±"
+                    placeholder="Ã˜Â£Ã˜Â¯Ã˜Â®Ã™â€ž Ã™Æ’Ã™â€žÃ™â€¦Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â±Ã™Ë†Ã˜Â±"
                     className="w-full px-3 sm:px-4 py-3 sm:py-4 pr-10 sm:pr-12 border-2 border-gray-200 rounded-xl transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed bg-white text-gray-800 placeholder-gray-400 group-hover:border-blue-300 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none text-right text-sm sm:text-base"
                     aria-required="true"
                     aria-invalid={!!error}
@@ -249,19 +233,18 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                 </div>
               </div>
 
-              {/* Login Button */}
               <button
                 type="submit"
                 disabled={loading || !isFormValid}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 sm:py-4 rounded-xl shadow-2xl transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base tracking-wide focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed group transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:hover:scale-100 mt-2"
                 style={{
-                  boxShadow: "0 8px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.1)",
+                  boxShadow: '0 8px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.1)',
                 }}
               >
                 {loading ? (
                   <>
                     <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span className="text-xs sm:text-sm">Ø¬Ø§Ø±ÙŠ Ø§Ù„Ù…ØµØ§Ø¯Ù‚Ø©...</span>
+                    <span className="text-xs sm:text-sm">Ã˜Â¬Ã˜Â§Ã˜Â±Ã™Å  Ã˜Â§Ã™â€žÃ™â€¦Ã˜ÂµÃ˜Â§Ã˜Â¯Ã™â€šÃ˜Â©...</span>
                   </>
                 ) : (
                   <>
@@ -274,7 +257,7 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                    <span className="text-xs sm:text-sm">ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø¥Ù„Ù‰ Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ù…Ø´Ø±ÙÙŠÙ†</span>
+                    <span className="text-xs sm:text-sm">Ã˜ÂªÃ˜Â³Ã˜Â¬Ã™Å Ã™â€ž Ã˜Â§Ã™â€žÃ˜Â¯Ã˜Â®Ã™Ë†Ã™â€ž Ã˜Â¥Ã™â€žÃ™â€° Ã˜Â¨Ã™Ë†Ã˜Â§Ã˜Â¨Ã˜Â© Ã˜Â§Ã™â€žÃ™â€¦Ã˜Â´Ã˜Â±Ã™ÂÃ™Å Ã™â€ </span>
                   </>
                 )}
               </button>
@@ -283,7 +266,6 @@ const SupervisorLogin = ({ onLogin, serverOnline }) => {
         </div>
       </div>
 
-      {/* Add custom animations */}
       <style jsx>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }

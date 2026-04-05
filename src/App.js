@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SupervisorLogin from './components/SupervisorLogin';
 import SupervisorDashboard from './components/SupervisorDashboard';
-import { checkServerStatus, supervisorAPI } from './utils/api';
+import { AUTH_REQUIRED_EVENT, checkServerStatus, supervisorAPI } from './utils/api';
 
 function App() {
   const [serverOnline, setServerOnline] = useState(false);
@@ -11,6 +11,13 @@ function App() {
 
   useEffect(() => {
     let isMounted = true;
+    const handleAuthRequired = () => {
+      if (!isMounted) {
+        return;
+      }
+
+      setSupervisorInfo(null);
+    };
 
     const initApp = async () => {
       const status = await checkServerStatus();
@@ -23,12 +30,12 @@ function App() {
 
       if (status) {
         try {
-          const response = await supervisorAPI.getCurrentUser();
-          if (isMounted && response.data?.user) {
-            setSupervisorInfo(response.data.user);
+          const session = await supervisorAPI.getCurrentUser();
+          if (isMounted && session.user) {
+            setSupervisorInfo(session.user);
           }
         } catch (error) {
-          if (error.response?.status !== 401) {
+          if (error.status !== 401) {
             console.error('Error restoring supervisor session:', error);
           }
         }
@@ -40,9 +47,11 @@ function App() {
     };
 
     initApp();
+    window.addEventListener(AUTH_REQUIRED_EVENT, handleAuthRequired);
 
     return () => {
       isMounted = false;
+      window.removeEventListener(AUTH_REQUIRED_EVENT, handleAuthRequired);
     };
   }, []);
 

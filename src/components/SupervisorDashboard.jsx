@@ -34,8 +34,7 @@ const SupervisorDashboard = ({ onLogout, supervisorInfo }) => {
 
   const fetchStats = async () => {
     try {
-      const response = await supervisorAPI.getDashboardStats();
-      const dashboardStats = response.data?.data || {};
+      const dashboardStats = await supervisorAPI.getDashboardStats();
       
       setStats({
         totalProjects: dashboardStats.totalProjects || 0,
