@@ -45,7 +45,6 @@ const SupervisorDashboard = ({ onLogout, supervisorInfo }) => {
       });
 
       // جمع البيانات من جميع المشاريع
-        try {
           // عد المهام
           
           
