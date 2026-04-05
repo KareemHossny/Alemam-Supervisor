@@ -23,6 +23,18 @@ const shouldRedirectToLogin = (error) => {
   return window.location.pathname !== '/login';
 };
 
+const normalizeTaskFilters = (filtersOrDate) => {
+  if (!filtersOrDate) {
+    return undefined;
+  }
+
+  if (typeof filtersOrDate === 'string') {
+    return { date: filtersOrDate };
+  }
+
+  return filtersOrDate;
+};
+
 // Response Interceptor
 api.interceptors.response.use(
   (response) => {
@@ -47,10 +59,12 @@ export const supervisorAPI = {
   getMyProjects: () => api.get('/supervisor/projects'),
 
   // Tasks Review
-  getDailyTasks: (projectId, date) => api.get(`/supervisor/daily-tasks/${projectId}`, {
-    params: date ? { date } : undefined,
+  getDailyTasks: (projectId, filters) => api.get(`/supervisor/daily-tasks/${projectId}`, {
+    params: normalizeTaskFilters(filters),
   }),
-  getMonthlyTasks: (projectId) => api.get(`/supervisor/monthly-tasks/${projectId}`),
+  getMonthlyTasks: (projectId, filters) => api.get(`/supervisor/monthly-tasks/${projectId}`, {
+    params: normalizeTaskFilters(filters),
+  }),
   reviewDailyTask: (taskId, reviewData) => api.put(`/supervisor/daily-tasks/${taskId}/review`, reviewData),
   reviewMonthlyTask: (taskId, reviewData) => api.put(`/supervisor/monthly-tasks/${taskId}/review`, reviewData),
 };
