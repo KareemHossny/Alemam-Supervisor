@@ -57,6 +57,8 @@ export const supervisorAPI = {
 
   // Projects
   getMyProjects: () => api.get('/supervisor/projects'),
+  getDashboardStats: () => api.get('/supervisor/dashboard/stats'),
+  getProjectStats: () => api.get('/supervisor/projects/stats'),
 
   // Tasks Review
   getDailyTasks: (projectId, filters) => api.get(`/supervisor/daily-tasks/${projectId}`, {

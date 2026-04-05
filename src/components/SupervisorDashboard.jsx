@@ -34,77 +34,27 @@ const SupervisorDashboard = ({ onLogout, supervisorInfo }) => {
 
   const fetchStats = async () => {
     try {
-      const projectsResponse = await supervisorAPI.getMyProjects();
-      const projects = projectsResponse.data;
+      const response = await supervisorAPI.getDashboardStats();
+      const dashboardStats = response.data?.data || {};
       
-      let pendingReviews = 0;
-      let reviewedTasks = 0;
-      let totalEngineers = new Set();
+      setStats({
+        totalProjects: dashboardStats.totalProjects || 0,
+        pendingReviews: dashboardStats.pendingReviews || 0,
+        reviewedTasks: dashboardStats.reviewedTasks || 0,
+        totalEngineers: dashboardStats.totalEngineers || 0
+      });
 
       // جمع البيانات من جميع المشاريع
-      const tasksPromises = projects.map(async (project) => {
         try {
-          const [dailyTasksResponse, monthlyTasksResponse] = await Promise.all([
-            supervisorAPI.getDailyTasks(project._id),
-            supervisorAPI.getMonthlyTasks(project._id)
-          ]);
-          
-          const dailyTasks = dailyTasksResponse.data;
-          const monthlyTasks = monthlyTasksResponse.data;
-          
           // عد المهام
-          const projectPendingReviews = dailyTasks.filter(task => task.status === 'pending').length + 
-                                       monthlyTasks.filter(task => task.status === 'pending').length;
           
-          const projectReviewedTasks = dailyTasks.filter(task => task.status === 'done' || task.status === 'failed').length + 
-                                      monthlyTasks.filter(task => task.status === 'done' || task.status === 'failed').length;
           
           // جمع المهندسين
-          const projectEngineers = new Set();
-          
-          dailyTasks.forEach(task => {
-            if (task.createdBy?._id) projectEngineers.add(task.createdBy._id);
-          });
-          
-          monthlyTasks.forEach(task => {
-            if (task.createdBy?._id) projectEngineers.add(task.createdBy._id);
-          });
 
-          project.engineers?.forEach(engineer => {
-            if (engineer._id) projectEngineers.add(engineer._id);
-          });
-
-          return {
-            pendingReviews: projectPendingReviews,
-            reviewedTasks: projectReviewedTasks,
-            engineers: projectEngineers
-          };
-        } catch (error) {
-          console.error(`Error fetching tasks for project ${project._id}:`, error);
-          return {
-            pendingReviews: 0,
-            reviewedTasks: 0,
-            engineers: new Set()
-          };
-        }
-      });
 
       // انتظر اكتمال جميع الـ promises
-      const results = await Promise.all(tasksPromises);
 
       // جمع النتائج
-      results.forEach(result => {
-        pendingReviews += result.pendingReviews;
-        reviewedTasks += result.reviewedTasks;
-        result.engineers.forEach(engineerId => totalEngineers.add(engineerId));
-      });
-
-      setStats({
-        totalProjects: projects.length,
-        pendingReviews,
-        reviewedTasks,
-        totalEngineers: totalEngineers.size
-      });
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
